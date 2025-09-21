@@ -33,12 +33,13 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import { useSession } from "next-auth/react"
 
 const data = {
   user: {
     name: "admin",
     email: "admin@magasin.com",
-    avatar: "/avatars/shadcn.jpg",
+    avatar: "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y",
   },
   navMain: [
     {
@@ -140,6 +141,12 @@ const data = {
 export function AppSidebar({
   ...props
 }) {
+  const  {data: session} = useSession();
+  console.log("session -> ",session?.user);
+  if(session){
+    data.user.name = session.user.prenom + " " + session.user.nom;
+    data.user.email = session.user.email;
+  }
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -148,7 +155,7 @@ export function AppSidebar({
             <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-1.5">
               <a href="/">
                 <IconBrandSketch className="!size-5" />
-                <span className="text-base font-semibold">OKOUME</span>
+                <span className="text-base font-semibold">OKOUME MANAGER</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -160,7 +167,8 @@ export function AppSidebar({
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        {session?.user && <NavUser user={session.user} />}
+        
       </SidebarFooter>
     </Sidebar>
   );
